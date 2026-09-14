@@ -35,6 +35,13 @@ function Invoke-Hidden([string]$filePath, [string[]]$arguments, [string]$working
     }
 }
 
+function Test-RuntimeDependencies {
+    $checkOutputFile = Join-Path $participantDir "dependency-check.log"
+    $checkErrorFile = Join-Path $participantDir "dependency-check-error.log"
+    $process = Start-Process -FilePath $venvPython -ArgumentList @("-c", "import fastapi, httpx, uvicorn, dotenv") -WorkingDirectory $projectRoot -WindowStyle Hidden -Wait -PassThru -RedirectStandardOutput $checkOutputFile -RedirectStandardError $checkErrorFile
+    return $process.ExitCode -eq 0
+}
+
 function Ensure-Setup {
     if (-not (Test-Path -LiteralPath $venvPython)) {
         $systemPython = (Get-Command python -ErrorAction SilentlyContinue).Source
@@ -44,12 +51,10 @@ function Ensure-Setup {
         Invoke-Hidden $systemPython @("-m", "venv", ".venv") $projectRoot
     }
 
-    & $venvPython -c "import fastapi, httpx, uvicorn, dotenv" 2>$null
-    $dependenciesReady = $LASTEXITCODE -eq 0
+    $dependenciesReady = Test-RuntimeDependencies
     if (-not $dependenciesReady) {
         Invoke-Hidden $venvPython @("-m", "pip", "install", "--disable-pip-version-check", "--no-input", "--retries", "3", "--timeout", "60", "-r", (Join-Path $participantDir "requirements.txt")) $projectRoot
-        & $venvPython -c "import fastapi, httpx, uvicorn, dotenv" 2>$null
-        if ($LASTEXITCODE -ne 0) {
+        if (-not (Test-RuntimeDependencies)) {
             throw "필요한 구성요소 설치가 끝나지 않았습니다. 인터넷 연결을 확인한 뒤 다시 시도해 주세요."
         }
     }

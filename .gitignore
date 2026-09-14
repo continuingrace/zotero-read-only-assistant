@@ -4,3 +4,5 @@ __pycache__/
 .uv-cache/
 .env
 *.pyc
+*.log
+participant/.bridge.pid
