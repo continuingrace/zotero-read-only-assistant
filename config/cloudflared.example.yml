@@ -1,0 +1,10 @@
+# 운영용 named tunnel 예시. 실제 credentials-file은 저장소 밖에 보관하세요.
+tunnel: <named-tunnel-id>
+credentials-file: C:\Users\<user>\.cloudflared\<named-tunnel-id>.json
+
+ingress:
+  - hostname: zotero-bridge.example.com
+    service: http://127.0.0.1:8787
+    originRequest:
+      noTLSVerify: false
+  - service: http_status:404

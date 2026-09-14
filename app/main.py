@@ -1,0 +1,7 @@
+from dotenv import load_dotenv
+
+load_dotenv()
+
+from .mcp_server import create_app
+
+app = create_app()
