@@ -25,9 +25,13 @@ function Show-Error([string]$message) {
 }
 
 function Invoke-Hidden([string]$filePath, [string[]]$arguments, [string]$workingDirectory) {
-    $process = Start-Process -FilePath $filePath -ArgumentList $arguments -WorkingDirectory $workingDirectory -WindowStyle Hidden -Wait -PassThru
+    $setupLogFile = Join-Path $participantDir "setup.log"
+    $setupErrorFile = Join-Path $participantDir "bridge-error.log"
+    $process = Start-Process -FilePath $filePath -ArgumentList $arguments -WorkingDirectory $workingDirectory -WindowStyle Hidden -Wait -PassThru -RedirectStandardOutput $setupLogFile -RedirectStandardError $setupErrorFile
     if ($process.ExitCode -ne 0) {
-        throw "Setup failed. Please check bridge-error.log."
+        $details = if (Test-Path -LiteralPath $setupErrorFile) { (Get-Content $setupErrorFile -Raw).Trim() } else { "No setup details were recorded." }
+        if (-not $details) { $details = "The package installer returned exit code $($process.ExitCode)." }
+        throw "Setup failed.`n`n$details"
     }
 }
 
@@ -38,7 +42,16 @@ function Ensure-Setup {
             throw "Python 3.11 or newer is required. Please contact the administrator."
         }
         Invoke-Hidden $systemPython @("-m", "venv", ".venv") $projectRoot
-        Invoke-Hidden $venvPython @("-m", "pip", "install", "-r", (Join-Path $participantDir "requirements.txt")) $projectRoot
+    }
+
+    & $venvPython -c "import fastapi, httpx, uvicorn, dotenv" 2>$null
+    $dependenciesReady = $LASTEXITCODE -eq 0
+    if (-not $dependenciesReady) {
+        Invoke-Hidden $venvPython @("-m", "pip", "install", "--disable-pip-version-check", "--no-input", "--retries", "3", "--timeout", "60", "-r", (Join-Path $participantDir "requirements.txt")) $projectRoot
+        & $venvPython -c "import fastapi, httpx, uvicorn, dotenv" 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            throw "필요한 구성요소 설치가 끝나지 않았습니다. 인터넷 연결을 확인한 뒤 다시 시도해 주세요."
+        }
     }
 
     $envFile = Join-Path $projectRoot ".env"
@@ -64,6 +77,10 @@ function Start-Bridge {
     $process = Start-Process -FilePath $venvPython -ArgumentList @("-m", "uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", "8787") -WorkingDirectory $projectRoot -WindowStyle Hidden -PassThru -RedirectStandardOutput $logFile -RedirectStandardError $errorLogFile
     $process.Id | Set-Content -Path $pidFile -Encoding ASCII
     Start-Sleep -Milliseconds 800
+    if ($process.HasExited) {
+        $details = if (Test-Path -LiteralPath $errorLogFile) { (Get-Content $errorLogFile -Raw).Trim() } else { "No bridge details were recorded." }
+        throw "읽기 도우미를 시작하지 못했습니다.`n`n$details"
+    }
     Start-Process "http://127.0.0.1:8787/reader"
 }
 
