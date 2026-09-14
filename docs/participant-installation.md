@@ -1,6 +1,6 @@
 # 참가자용 간단 설치 안내
 
-이 안내는 일반 참가자용입니다. 참가자는 터미널, PowerShell 명령, HTTPS 터널, 인증 토큰을 입력하지 않습니다.
+이 안내는 일반 참가자용입니다. 참가자는 터미널, PowerShell 명령, HTTPS 터널, 인증 토큰을 입력하지 않습니다. 이 폴더의 `participant\START-HERE.txt`도 함께 참고하세요.
 
 ## 참가자에게 전달할 것
 
@@ -27,7 +27,7 @@
 - Zotero Desktop 설치 링크를 함께 보냅니다.
 - 참가자가 사용할 ZIP 파일을 준비합니다.
 - 처음 모임에서 Zotero의 로컬 API 허용 설정을 확인합니다.
-- Python이 없는 참가자에게 Python 3.11 이상 설치를 한 번 도와줍니다.
+- Python이 없는 참가자에게 [Python 3.11 이상](https://www.python.org/downloads/) 설치를 한 번 도와줍니다. 설치 화면에서 `Add python.exe to PATH`를 체크합니다.
 
 개인 ChatGPT 계정 참가자에게는 ChatGPT 사용자 지정 MCP 앱을 요구하지 않습니다. ChatGPT 안에서 쓰는 MCP 연결은 별도의 고급 설정이며, 개인계정·요금제에 따라 제공되지 않을 수 있습니다.
 
