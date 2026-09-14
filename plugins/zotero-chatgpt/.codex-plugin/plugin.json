@@ -1,0 +1,27 @@
+{
+  "name": "zotero-chatgpt",
+  "version": "0.2.0",
+  "description": "Use a local Zotero Desktop library from ChatGPT with read tools and confirmation-gated tag changes.",
+  "author": {
+    "name": "continuingrace",
+    "url": "https://github.com/continuingrace"
+  },
+  "homepage": "https://github.com/continuingrace/zotero-read-only-assistant",
+  "repository": "https://github.com/continuingrace/zotero-read-only-assistant",
+  "license": "MIT",
+  "keywords": ["zotero", "research", "papers", "pdf", "mcp", "chatgpt"],
+  "interface": {
+    "displayName": "Zotero for ChatGPT",
+    "shortDescription": "ChatGPT에서 내 Zotero 논문을 찾고 분석합니다.",
+    "longDescription": "Windows용 ChatGPT 데스크톱 앱에서 로컬 Zotero 자료를 검색하고, 메타데이터와 PDF 색인 전문을 읽어 요약·비교합니다. 태그 변경과 컬렉션 추가는 ChatGPT와 Zotero의 승인을 모두 받아야 합니다.",
+    "developerName": "continuingrace",
+    "category": "Education & Research",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "defaultPrompt": [
+      "내 Zotero에서 최근 추가된 논문 5개를 찾아줘.",
+      "이 논문의 PDF 전문을 읽고 핵심 내용을 요약해줘.",
+      "이 자료에 어울리는 태그를 제안만 해줘."
+    ]
+  },
+  "mcpServers": "./.mcp.json"
+}

@@ -1,74 +1,85 @@
-# Zotero 읽기 전용 MCP 브리지
+# Zotero for ChatGPT
 
-각 참가자의 Zotero Desktop 라이브러리를 읽기 전용으로 검색하는 도구입니다. 기본 참가자 모드는 인터넷 공개나 ChatGPT 설정 없이 자기 컴퓨터에서 브라우저로 사용합니다. 고급 사용자는 같은 코드의 `/mcp` 엔드포인트를 ChatGPT 또는 다른 MCP 클라이언트에 연결할 수 있습니다.
+Windows용 ChatGPT 데스크톱 앱의 일반 채팅에서 각 사용자의 로컬 Zotero Desktop 자료를 검색하고 분석하는 플러그인입니다. 참가자는 Python, 터미널, PowerShell, 포트 번호, 인증 토큰, HTTPS 주소를 입력하지 않습니다.
 
-## 지원 범위
+기존 `Zotero-Read-Only-Assistant.exe`는 브라우저에서 목록만 보는 로컬 도우미였습니다. 이 프로젝트의 새 설치 파일 `Install-Zotero-for-ChatGPT.exe`는 ChatGPT가 Zotero 도구를 직접 호출하도록 로컬 MCP 플러그인을 설치합니다. 요약·비교·질문 답변은 ChatGPT가 수행합니다.
 
-도구는 다음 7개뿐이며 모두 이름과 설명에 `read_only`를 포함합니다.
+## 참가자 설치
 
-- `zotero_read_only_search_library`
-- `zotero_read_only_get_recent_items`
-- `zotero_read_only_get_item_metadata`
-- `zotero_read_only_list_tags`
-- `zotero_read_only_list_collections`
-- `zotero_read_only_list_pdf_attachments`
-- `zotero_read_only_search_pdf_full_text`
-
-서버는 Zotero에 읽기 요청만 보내며, 도구 allowlist 밖의 MCP 호출은 거부합니다. 논문/서지 레코드, 독립 PDF, 하위 첨부파일은 `classification`으로 구분합니다. 값이 없으면 정확히 `확인되지 않음`을 반환합니다.
-
-## 참가자에게 권장하는 사용법
-
-1. GitHub의 Releases에서 `Zotero-Read-Only-Assistant.exe`를 받습니다.
-2. Zotero Desktop을 설치하고 실행합니다.
-3. Zotero에서 로컬 API 허용을 켭니다.
-4. `Zotero-Read-Only-Assistant.exe`를 더블클릭합니다.
-5. `검색 화면 열기`를 누릅니다.
-6. 브라우저에 `Zotero 읽기 도우미`가 열리면 검색합니다.
-
-실행 파일에는 필요한 Python 환경이 포함됩니다. 참가자는 터미널, Python, 포트 번호, 인증 토큰, HTTPS 주소를 입력하지 않습니다.
-
-## 구조
+1. [Zotero Desktop](https://www.zotero.org/download/)을 설치하고 실행합니다.
+2. Zotero에서 `설정 → 고급 → 이 컴퓨터의 다른 애플리케이션이 Zotero와 통신하도록 허용`을 켭니다.
+3. GitHub Releases에서 `Install-Zotero-for-ChatGPT.exe`를 내려받아 더블클릭합니다.
+4. 설치 완료 안내가 나오면 ChatGPT 데스크톱 앱을 완전히 종료했다가 다시 엽니다.
+5. ChatGPT의 `설정 → 플러그인`에서 `Personal → Zotero for ChatGPT`를 설치하거나 활성화합니다.
+6. 새 일반 채팅에서 다음과 같이 말합니다.
 
 ```text
-ChatGPT custom MCP app
-        │ HTTPS + Bearer token 또는 OAuth를 종료하는 보안 터널
-        ▼
-참가자 PC의 bridge: 127.0.0.1:8787/mcp
-        │ loopback HTTP 읽기 요청만
-        ▼
-Zotero Desktop Local API: 127.0.0.1:23119/api/
+내 Zotero에서 최근 추가된 논문 5개를 찾아줘.
 ```
 
-참가자마다 브리지와 토큰을 하나씩 사용해야 합니다. 하나의 중앙 서버가 여러 참가자의 로컬 Zotero를 직접 읽는 구조는 지원하지 않습니다.
+설치 상세와 문제 해결은 [참가자용 설치 안내](docs/participant-installation.md)를 참고하세요.
 
-## 개발자용 빠른 실행
+## 지원 기능
 
-1. Zotero Desktop에서 `설정 → 고급 → 이 컴퓨터의 다른 애플리케이션이 Zotero와 통신하도록 허용`을 켭니다.
-2. Python 3.11 이상 환경에서 `python -m venv .venv`와 `pip install -r requirements.txt`를 실행합니다.
-3. `.env.example`을 `.env`로 복사하고 32자 이상의 무작위 `BRIDGE_AUTH_TOKEN`을 설정합니다.
-4. PowerShell에서 `./run.ps1`을 실행합니다.
-5. 외부 공개는 [docs/installation.md](docs/installation.md)의 보안 터널 절차로 구성합니다.
+읽기 도구 8개:
 
-## 일반 참가자용 파일
+- 라이브러리 검색
+- 최근 자료 조회
+- 자료 메타데이터 조회
+- 태그 조회
+- 컬렉션 조회
+- 하위 PDF 첨부파일 확인
+- PDF 색인 전문 검색
+- PDF 색인 전문을 구간별로 읽기
 
-일반 참가자에게는 저장소 전체가 아니라 프로젝트 폴더를 압축해 전달합니다. 참가자는 `participant\Start-Participant.vbs`를 더블클릭하고 `Setup and Start` 버튼만 누르면 브라우저 검색 화면을 사용할 수 있습니다. 자세한 안내는 [docs/participant-installation.md](docs/participant-installation.md)에 있습니다.
+승인 후 쓰기 도구 2개:
 
-## ChatGPT 등록
+- 태그 추가·제거
+- 기존 컬렉션에 자료 추가
 
-ChatGPT의 사용자 지정 MCP 앱은 워크스페이스 정책과 요금제에 따라 Developer mode가 필요할 수 있습니다. 현재 UI에서 `Settings → Apps → Create` 또는 워크스페이스의 사용자 지정 앱 생성 메뉴를 열고 다음을 등록합니다.
+논문·서지 레코드, 독립 PDF, 하위 PDF 첨부파일을 구분합니다. 값이 없으면 정확히 `확인되지 않음`을 반환합니다. PDF 전문은 Zotero가 색인한 텍스트만 읽습니다.
 
-- MCP server URL: `https://<참가자-터널-호스트>/mcp`
-- 인증: `Authorization: Bearer <BRIDGE_AUTH_TOKEN>` 또는 조직의 OAuth 보호 프록시
-- 권한: 읽기 전용 도구만 허용
+다음 변경은 지원하지 않습니다.
 
-UI가 고정 Bearer 헤더 입력을 제공하지 않고 OAuth만 허용하면, 브리지 앞에 OAuth 2.1/OIDC reverse proxy를 두고 `/mcp`로 전달할 때 내부적으로 `Authorization: Bearer <BRIDGE_AUTH_TOKEN>`을 주입합니다. 브리지 토큰은 ChatGPT 대화나 저장소에 넣지 않습니다.
+- 자료 또는 파일 삭제
+- 컬렉션 생성·삭제·이동
+- 노트 생성·수정·삭제
+- 제목·저자·초록 등 서지정보 덮어쓰기
 
-## 검증
+태그나 컬렉션을 변경할 때는 ChatGPT의 도구 실행 승인과 Zotero Desktop의 로컬 쓰기 권한 승인이 모두 필요합니다.
+
+## 구조와 보안
+
+```text
+Windows ChatGPT 데스크톱 일반 채팅
+              │ 로컬 stdio MCP
+              ▼
+      Zotero for ChatGPT 플러그인
+              │ localhost 요청
+              ▼
+ Zotero Desktop 127.0.0.1:23119/api/
+```
+
+Zotero 로컬 API는 `localhost`에만 둡니다. 외부 HTTPS 터널, 공유기 포트 개방, 참가자별 서버 주소와 토큰은 필요하지 않습니다. 이 방식은 Windows ChatGPT 데스크톱 앱용이며 웹 브라우저나 모바일 ChatGPT에서는 로컬 Zotero에 연결할 수 없습니다.
+
+ChatGPT가 요약·비교를 수행하면 선택된 서지정보나 PDF 텍스트가 사용자의 OpenAI 서비스로 전송될 수 있습니다. 민감한 자료는 사용 전 소속기관 정책과 사용 중인 ChatGPT 계정의 데이터 설정을 확인하세요.
+
+## Claude용 Zotero MCP와의 관계
+
+[isezen/zotero-mcp](https://github.com/isezen/zotero-mcp)는 Claude에만 묶인 형식이 아니라 MCP 서버이므로 기능 설계의 참고가 될 수 있습니다. 이 프로젝트는 일반 참가자용 Windows 설치, ChatGPT 플러그인 등록, 로컬 Zotero 승인 절차를 별도로 구현했고 삭제·노트 편집·서지정보 덮어쓰기 같은 기능은 포함하지 않았습니다.
+
+## 개발 및 검증
 
 ```powershell
-$env:BRIDGE_AUTH_TOKEN = "a-long-random-token-at-least-32-characters"
 python -m pytest -q
-python -m compileall app tests
+python -m compileall app tests stdio_entry.py setup_entry.py
+powershell -ExecutionPolicy Bypass -File .\build-windows.ps1
 ```
 
-운영 전 체크리스트는 [docs/installation.md](docs/installation.md)를 참고하세요. 테스트 프롬프트는 [prompts/test-prompts.md](prompts/test-prompts.md)에 있습니다.
+빌드 결과:
+
+- `release/Install-Zotero-for-ChatGPT.exe`: 참가자용 설치 파일
+- `release/Zotero-ChatGPT-MCP.exe`: 플러그인 내부 MCP 실행 파일
+- `release/Zotero-Read-Only-Assistant.exe`: 이전 로컬 목록 열람 도우미
+
+테스트 문장은 [테스트 프롬프트](prompts/test-prompts.md)에 있습니다. HTTPS 서버 방식은 데스크톱 플러그인을 사용할 수 없는 조직 환경을 위한 고급·레거시 선택지이며 [고급 설치 안내](docs/installation.md)에 분리했습니다.

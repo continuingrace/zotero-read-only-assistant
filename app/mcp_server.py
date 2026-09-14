@@ -15,7 +15,7 @@ from .reader_ui import register_reader_ui
 from .tools import HANDLERS, TOOL_DEFINITIONS
 from .zotero import ZoteroClient, ZoteroError
 
-LOGGER = logging.getLogger("zotero-read-only-mcp-bridge")
+LOGGER = logging.getLogger("zotero-chatgpt-mcp")
 PROTOCOL_VERSION = "2025-03-26"
 
 
@@ -39,7 +39,7 @@ def create_app(settings: Settings | None = None, zotero: ZoteroClient | None = N
     settings = settings or Settings.from_env()
     client = zotero or ZoteroClient(settings.zotero_base_url, settings.max_results)
     limiter = RateLimiter(settings.rate_limit_per_minute)
-    app = FastAPI(title="Zotero Read-Only MCP Bridge", docs_url=None, redoc_url=None)
+    app = FastAPI(title="Zotero for ChatGPT MCP", docs_url=None, redoc_url=None)
     app.state.zotero = client
     register_reader_ui(app, client)
 
@@ -102,7 +102,7 @@ async def _handle_rpc(payload: Any, client: ZoteroClient) -> dict[str, Any] | No
     if method in {"notifications/initialized", "notifications/cancelled"}:
         return None
     if method == "initialize":
-        return {"jsonrpc": "2.0", "id": request_id, "result": {"protocolVersion": PROTOCOL_VERSION, "capabilities": {"tools": {"listChanged": False}}, "serverInfo": {"name": "zotero-read-only-mcp-bridge", "version": "1.0.0"}}}
+        return {"jsonrpc": "2.0", "id": request_id, "result": {"protocolVersion": PROTOCOL_VERSION, "capabilities": {"tools": {"listChanged": False}}, "serverInfo": {"name": "zotero-chatgpt-mcp", "version": "0.2.0"}}}
     if method == "tools/list":
         return {"jsonrpc": "2.0", "id": request_id, "result": {"tools": TOOL_DEFINITIONS}}
     if method == "tools/call":
@@ -110,14 +110,14 @@ async def _handle_rpc(payload: Any, client: ZoteroClient) -> dict[str, Any] | No
         name = params.get("name")
         handler = HANDLERS.get(name)
         if handler is None:
-            return _rpc_error(request_id, -32602, "허용되지 않은 읽기 전용 도구입니다")
+            return _rpc_error(request_id, -32602, "허용되지 않은 Zotero 도구입니다")
         try:
             data = await handler(client, params.get("arguments") or {})
         except (ValueError, ZoteroError) as exc:
             return {"jsonrpc": "2.0", "id": request_id, "result": {"isError": True, "content": [{"type": "text", "text": str(exc)}]}}
         except Exception:
-            LOGGER.exception("read-only tool failed: %s", name)
-            return {"jsonrpc": "2.0", "id": request_id, "result": {"isError": True, "content": [{"type": "text", "text": "읽기 요청을 처리하지 못했습니다"}]}}
+            LOGGER.exception("Zotero tool failed: %s", name)
+            return {"jsonrpc": "2.0", "id": request_id, "result": {"isError": True, "content": [{"type": "text", "text": "Zotero 요청을 처리하지 못했습니다"}]}}
         text = json.dumps(data, ensure_ascii=False)
         return {"jsonrpc": "2.0", "id": request_id, "result": {"content": [{"type": "text", "text": text}], "structuredContent": data}}
     return _rpc_error(request_id, -32601, "지원하지 않는 MCP 메서드입니다")

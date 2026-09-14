@@ -35,6 +35,12 @@ def _query(value: Any, required: bool = False) -> str:
     return result
 
 
+def _short_text(value: Any, field: str, maximum: int = 200) -> str:
+    if not isinstance(value, str) or not value.strip() or len(value.strip()) > maximum:
+        raise ValueError(f"{field}은 1자에서 {maximum}자 사이여야 합니다")
+    return value.strip()
+
+
 async def search_library(client: ZoteroClient, args: dict[str, Any]) -> dict[str, Any]:
     query = _query(args.get("query"), required=True)
     limit = _limit(args.get("limit"), client.max_results)
@@ -122,6 +128,79 @@ async def search_pdf_full_text(client: ZoteroClient, args: dict[str, Any]) -> di
     }
 
 
+async def get_pdf_text(client: ZoteroClient, args: dict[str, Any]) -> dict[str, Any]:
+    requested_key = _key(args.get("item_key"))
+    start = args.get("start", 0)
+    max_chars = args.get("max_chars", 30000)
+    if not isinstance(start, int) or isinstance(start, bool) or start < 0:
+        raise ValueError("start는 0 이상의 정수여야 합니다")
+    if not isinstance(max_chars, int) or isinstance(max_chars, bool) or not 1000 <= max_chars <= 50000:
+        raise ValueError("max_chars는 1000에서 50000 사이의 정수여야 합니다")
+
+    item = await client.item(requested_key)
+    data = item.get("data") or {}
+    attachment_key = requested_key
+    if data.get("itemType") != "attachment":
+        children = await client.children(requested_key)
+        pdfs = [child for child in children if is_pdf(child.get("data") or {})]
+        if not pdfs:
+            return {"requested_item_key": requested_key, "attachment_key": UNKNOWN, "content": UNKNOWN, "reason": "PDF 첨부파일이 없습니다"}
+        attachment_key = str(pdfs[0].get("key") or (pdfs[0].get("data") or {}).get("key"))
+
+    fulltext = await client.fulltext(attachment_key)
+    if not fulltext or not isinstance(fulltext.get("content"), str) or not fulltext["content"]:
+        return {"requested_item_key": requested_key, "attachment_key": attachment_key, "content": UNKNOWN, "reason": "Zotero에서 검색 가능한 PDF 전문이 확인되지 않음"}
+    content = fulltext["content"]
+    end = min(len(content), start + max_chars)
+    return {
+        "requested_item_key": requested_key,
+        "attachment_key": attachment_key,
+        "content": content[start:end],
+        "start": start,
+        "end": end,
+        "total_characters": len(content),
+        "has_more": end < len(content),
+        "indexed_pages": known(fulltext.get("indexedPages")),
+        "total_pages": known(fulltext.get("totalPages")),
+    }
+
+
+async def write_tag_with_confirmation(client: ZoteroClient, args: dict[str, Any]) -> dict[str, Any]:
+    item_key = _key(args.get("item_key"))
+    action = args.get("action")
+    if action not in {"add", "remove"}:
+        raise ValueError("action은 add 또는 remove여야 합니다")
+    tag = _short_text(args.get("tag"), "tag")
+    item = await client.item(item_key)
+    data = item.get("data") or {}
+    before = [str(entry.get("tag")) for entry in (data.get("tags") or []) if entry.get("tag")]
+    if action == "add":
+        after = before if tag in before else [*before, tag]
+    else:
+        after = [value for value in before if value != tag]
+    if after == before:
+        return {"changed": False, "item_key": item_key, "action": action, "tag": tag, "before": before, "after": after}
+    updated = await client.patch_item(item_key, {"tags": [{"tag": value} for value in after]})
+    updated_data = updated.get("data") or {}
+    confirmed_after = [str(entry.get("tag")) for entry in (updated_data.get("tags") or []) if entry.get("tag")]
+    return {"changed": True, "item_key": item_key, "action": action, "tag": tag, "before": before, "after": confirmed_after}
+
+
+async def add_to_collection_with_confirmation(client: ZoteroClient, args: dict[str, Any]) -> dict[str, Any]:
+    item_key = _key(args.get("item_key"))
+    collection_key = _key(args.get("collection_key"))
+    await client.get(f"/users/0/collections/{collection_key}")
+    item = await client.item(item_key)
+    data = item.get("data") or {}
+    before = [str(value) for value in (data.get("collections") or [])]
+    after = before if collection_key in before else [*before, collection_key]
+    if after == before:
+        return {"changed": False, "item_key": item_key, "collection_key": collection_key, "before": before, "after": after}
+    updated = await client.patch_item(item_key, {"collections": after})
+    confirmed_after = [str(value) for value in ((updated.get("data") or {}).get("collections") or [])]
+    return {"changed": True, "item_key": item_key, "collection_key": collection_key, "before": before, "after": confirmed_after}
+
+
 TOOL_DEFINITIONS = [
     {
         "name": "zotero_read_only_search_library",
@@ -165,6 +244,24 @@ TOOL_DEFINITIONS = [
         "inputSchema": {"type": "object", "properties": {"query": {"type": "string"}, "limit": {"type": "integer", "minimum": 1, "maximum": 100}}, "required": ["query"], "additionalProperties": False},
         "annotations": {"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True},
     },
+    {
+        "name": "zotero_read_only_get_pdf_text",
+        "description": "읽기 전용: 논문 레코드 또는 PDF 첨부파일의 Zotero 색인 전문을 구간별로 읽습니다. 자료를 변경하지 않습니다.",
+        "inputSchema": {"type": "object", "properties": {"item_key": {"type": "string", "pattern": "^[A-Z0-9]{8}$"}, "start": {"type": "integer", "minimum": 0}, "max_chars": {"type": "integer", "minimum": 1000, "maximum": 50000}}, "required": ["item_key"], "additionalProperties": False},
+        "annotations": {"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True},
+    },
+    {
+        "name": "zotero_write_tag_with_confirmation",
+        "description": "쓰기·승인 필요: Zotero 자료 하나에 태그를 추가하거나 제거합니다. ChatGPT 승인 뒤 Zotero 자체 변경 승인창도 통과해야 합니다.",
+        "inputSchema": {"type": "object", "properties": {"item_key": {"type": "string", "pattern": "^[A-Z0-9]{8}$"}, "action": {"type": "string", "enum": ["add", "remove"]}, "tag": {"type": "string", "minLength": 1, "maxLength": 200}}, "required": ["item_key", "action", "tag"], "additionalProperties": False},
+        "annotations": {"readOnlyHint": False, "destructiveHint": True, "idempotentHint": True},
+    },
+    {
+        "name": "zotero_write_add_to_collection_with_confirmation",
+        "description": "쓰기·승인 필요: Zotero 자료 하나를 기존 컬렉션에 추가합니다. 다른 컬렉션에서는 제거하거나 이동하지 않습니다.",
+        "inputSchema": {"type": "object", "properties": {"item_key": {"type": "string", "pattern": "^[A-Z0-9]{8}$"}, "collection_key": {"type": "string", "pattern": "^[A-Z0-9]{8}$"}}, "required": ["item_key", "collection_key"], "additionalProperties": False},
+        "annotations": {"readOnlyHint": False, "destructiveHint": False, "idempotentHint": True},
+    },
 ]
 
 HANDLERS = {
@@ -175,4 +272,7 @@ HANDLERS = {
     "zotero_read_only_list_collections": list_collections,
     "zotero_read_only_list_pdf_attachments": list_pdf_attachments,
     "zotero_read_only_search_pdf_full_text": search_pdf_full_text,
+    "zotero_read_only_get_pdf_text": get_pdf_text,
+    "zotero_write_tag_with_confirmation": write_tag_with_confirmation,
+    "zotero_write_add_to_collection_with_confirmation": add_to_collection_with_confirmation,
 }

@@ -9,3 +9,4 @@ participant/.bridge.pid
 .build-venv/
 .build/
 release/
+work/

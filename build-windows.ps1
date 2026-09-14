@@ -31,4 +31,36 @@ if (-not (Test-Path -LiteralPath $buildPython)) {
     --hidden-import uvicorn.lifespan.on `
     (Join-Path $projectRoot "desktop_entry.py")
 
+& $buildPython -m PyInstaller `
+    --noconfirm `
+    --clean `
+    --onefile `
+    --console `
+    --name "Zotero-ChatGPT-MCP" `
+    --distpath $releaseDir `
+    --workpath (Join-Path $workDir "stdio") `
+    --specpath $specDir `
+    --collect-all pydantic `
+    --hidden-import httpx `
+    (Join-Path $projectRoot "stdio_entry.py")
+
+$pluginDir = Join-Path $projectRoot "plugins\zotero-chatgpt"
+$pluginBin = Join-Path $pluginDir "bin"
+New-Item -ItemType Directory -Force -Path $pluginBin | Out-Null
+Copy-Item -Force (Join-Path $releaseDir "Zotero-ChatGPT-MCP.exe") (Join-Path $pluginBin "Zotero-ChatGPT-MCP.exe")
+
+& $buildPython -m PyInstaller `
+    --noconfirm `
+    --clean `
+    --onefile `
+    --windowed `
+    --name "Install-Zotero-for-ChatGPT" `
+    --distpath $releaseDir `
+    --workpath (Join-Path $workDir "setup") `
+    --specpath $specDir `
+    --add-data "$pluginDir;payload\zotero-chatgpt" `
+    (Join-Path $projectRoot "setup_entry.py")
+
 Write-Host "Built: $releaseDir\Zotero-Read-Only-Assistant.exe"
+Write-Host "Built: $releaseDir\Zotero-ChatGPT-MCP.exe"
+Write-Host "Built: $releaseDir\Install-Zotero-for-ChatGPT.exe"

@@ -1,29 +1,13 @@
-Zotero 읽기 도우미 소스 실행 안내
+일반 참가자는 이 폴더의 VBS, CMD, PowerShell 파일을 실행하지 마세요.
 
-일반 참가자는 이 폴더를 사용할 필요가 없습니다.
-GitHub Releases에서 Zotero-Read-Only-Assistant.exe를 받아 실행하세요.
-EXE에는 Python이 포함되어 있습니다.
+이 폴더는 이전 로컬 목록 열람 방식의 개발·호환용 파일입니다.
+ChatGPT 일반 채팅에서 Zotero를 사용하려면 GitHub Releases에서
+Install-Zotero-for-ChatGPT.exe를 받아 더블클릭하세요.
 
-아래 내용은 개발자 또는 EXE를 사용할 수 없는 경우의 대체 방법입니다.
+준비물
+1. Zotero Desktop: https://www.zotero.org/download/
+2. Windows용 ChatGPT 데스크톱 앱
+3. Install-Zotero-for-ChatGPT.exe
 
-1. Zotero Desktop을 설치합니다.
-   https://www.zotero.org/download/
-
-2. Zotero를 실행합니다.
-
-3. Zotero에서 다음 설정을 켭니다.
-   설정 → 고급 → 이 컴퓨터의 다른 애플리케이션이 Zotero와 통신하도록 허용
-
-4. Python 3.11 이상이 설치되어 있지 않다면 관리자가 아래 링크에서 설치해 줍니다.
-   https://www.python.org/downloads/
-   설치 화면에서 “Add python.exe to PATH”를 체크합니다.
-
-5. 이 폴더의 Start-Participant.vbs를 더블클릭합니다.
-
-   창이 열리지 않으면 같은 폴더의 Start-Participant-Fallback.cmd를 더블클릭합니다.
-
-6. 열린 창에서 Setup and Start를 한 번 누릅니다.
-
-7. 브라우저에 열린 Zotero 읽기 도우미에서 검색합니다.
-
-이 프로그램은 Zotero 자료를 읽기만 합니다. 자료를 추가, 수정, 삭제하지 않습니다.
+Python과 터미널은 필요하지 않습니다.
+자세한 내용은 docs/participant-installation.md를 확인하세요.

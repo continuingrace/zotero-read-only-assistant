@@ -40,6 +40,15 @@ def compact_item(item: dict[str, Any]) -> dict[str, Any]:
         "title": known(data.get("title")),
         "creators": data.get("creators") or UNKNOWN,
         "date": known(data.get("date")),
+        "abstract": known(data.get("abstractNote")),
+        "doi": known(data.get("DOI")),
+        "publication": known(
+            data.get("publicationTitle")
+            or data.get("bookTitle")
+            or data.get("proceedingsTitle")
+            or data.get("university")
+        ),
+        "language": known(data.get("language")),
         "date_added": known(data.get("dateAdded")),
         "date_modified": known(data.get("dateModified")),
         "parent_item_key": known(data.get("parentItem")),
@@ -63,7 +72,7 @@ class ZoteroClient:
                 "Accept": "application/json",
                 "Zotero-API-Version": "3",
                 "Zotero-Allowed-Request": "true",
-                "User-Agent": "zotero-read-only-mcp-bridge/1.0",
+                "User-Agent": "zotero-chatgpt-mcp/0.2.0",
             },
         )
 
@@ -101,3 +110,67 @@ class ZoteroClient:
     async def children(self, key: str) -> list[dict[str, Any]]:
         result = await self.get(f"/users/0/items/{key}/children", {"limit": self.max_results})
         return result if isinstance(result, list) else []
+
+    async def fulltext(self, key: str) -> dict[str, Any] | None:
+        response = await self._client.get(f"users/0/items/{key}/fulltext")
+        if response.status_code == 404:
+            return None
+        if response.status_code >= 400:
+            raise ZoteroError("PDF 전문을 가져오지 못했습니다")
+        try:
+            result = response.json()
+        except ValueError as exc:
+            raise ZoteroError("PDF 전문 응답을 해석할 수 없습니다") from exc
+        return result if isinstance(result, dict) else None
+
+    async def authorize_write(self) -> tuple[str, str]:
+        """Request a short-lived local write key through Zotero's own dialog."""
+        try:
+            probe = await self._client.get("")
+        except httpx.HTTPError as exc:
+            raise ZoteroError("Zotero Desktop에 연결할 수 없습니다") from exc
+        server_id = probe.headers.get("Zotero-Server-ID", "")
+        if not server_id:
+            raise ZoteroError("Zotero 10 이상의 로컬 쓰기 승인이 필요합니다")
+        response = await self._client.post(
+            "local/authorize",
+            json={"appName": "ChatGPT Zotero Assistant"},
+            headers={"Zotero-Server-ID": server_id},
+        )
+        if response.status_code == 403:
+            raise ZoteroError("Zotero에서 변경 승인이 거부되었습니다")
+        if response.status_code == 429:
+            raise ZoteroError("승인 요청이 너무 많습니다. 잠시 후 다시 시도해 주세요")
+        if response.status_code >= 400:
+            raise ZoteroError("Zotero 변경 승인을 받지 못했습니다")
+        try:
+            key = str(response.json().get("key") or "")
+        except ValueError as exc:
+            raise ZoteroError("Zotero 변경 승인 응답을 해석할 수 없습니다") from exc
+        if not key:
+            raise ZoteroError("Zotero 변경 승인 키가 발급되지 않았습니다")
+        return key, server_id
+
+    async def patch_item(self, key: str, changes: dict[str, Any]) -> dict[str, Any]:
+        current = await self.item(key)
+        data = current.get("data") or {}
+        version = data.get("version") or current.get("version")
+        if not isinstance(version, int):
+            raise ZoteroError("자료 버전을 확인할 수 없어 변경하지 않았습니다")
+        write_key, server_id = await self.authorize_write()
+        response = await self._client.patch(
+            f"users/0/items/{key}",
+            json=changes,
+            headers={
+                "Zotero-API-Key": write_key,
+                "Zotero-Server-ID": server_id,
+                "If-Unmodified-Since-Version": str(version),
+            },
+        )
+        if response.status_code in {401, 403}:
+            raise ZoteroError("Zotero 변경 승인이 만료되었거나 거부되었습니다")
+        if response.status_code in {409, 412, 428}:
+            raise ZoteroError("자료가 다른 곳에서 변경되어 안전하게 중단했습니다. 다시 시도해 주세요")
+        if response.status_code >= 400:
+            raise ZoteroError("Zotero 자료를 변경하지 못했습니다")
+        return await self.item(key)
