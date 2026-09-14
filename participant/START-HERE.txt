@@ -1,4 +1,10 @@
-Zotero 읽기 도우미 참가자용 시작 안내
+Zotero 읽기 도우미 소스 실행 안내
+
+일반 참가자는 이 폴더를 사용할 필요가 없습니다.
+GitHub Releases에서 Zotero-Read-Only-Assistant.exe를 받아 실행하세요.
+EXE에는 Python이 포함되어 있습니다.
+
+아래 내용은 개발자 또는 EXE를 사용할 수 없는 경우의 대체 방법입니다.
 
 1. Zotero Desktop을 설치합니다.
    https://www.zotero.org/download/

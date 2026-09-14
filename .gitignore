@@ -6,3 +6,6 @@ __pycache__/
 *.pyc
 *.log
 participant/.bridge.pid
+.build-venv/
+.build/
+release/

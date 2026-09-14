@@ -18,13 +18,14 @@
 
 ## 참가자에게 권장하는 사용법
 
-1. Zotero Desktop을 설치하고 실행합니다.
-2. Zotero에서 로컬 API 허용을 켭니다.
-3. `participant\Start-Participant.vbs`를 더블클릭합니다.
-4. 열린 창에서 `Setup and Start`를 한 번 누릅니다.
-5. 브라우저에 `Zotero 읽기 도우미`가 열리면 검색합니다.
+1. GitHub의 Releases에서 `Zotero-Read-Only-Assistant.exe`를 받습니다.
+2. Zotero Desktop을 설치하고 실행합니다.
+3. Zotero에서 로컬 API 허용을 켭니다.
+4. `Zotero-Read-Only-Assistant.exe`를 더블클릭합니다.
+5. `검색 화면 열기`를 누릅니다.
+6. 브라우저에 `Zotero 읽기 도우미`가 열리면 검색합니다.
 
-참가자는 터미널, Python, 포트 번호, 인증 토큰, HTTPS 주소를 입력하지 않습니다. 처음 한 번만 관리자가 Python 설치를 도와주면 됩니다. 배포 시에는 Python까지 포함한 Windows 실행 파일을 별도로 제공하면 이 단계도 없앨 수 있습니다.
+실행 파일에는 필요한 Python 환경이 포함됩니다. 참가자는 터미널, Python, 포트 번호, 인증 토큰, HTTPS 주소를 입력하지 않습니다.
 
 ## 구조
 
