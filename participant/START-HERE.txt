@@ -14,6 +14,8 @@ Zotero 읽기 도우미 참가자용 시작 안내
 
 5. 이 폴더의 Start-Participant.vbs를 더블클릭합니다.
 
+   창이 열리지 않으면 같은 폴더의 Start-Participant-Fallback.cmd를 더블클릭합니다.
+
 6. 열린 창에서 Setup and Start를 한 번 누릅니다.
 
 7. 브라우저에 열린 Zotero 읽기 도우미에서 검색합니다.
