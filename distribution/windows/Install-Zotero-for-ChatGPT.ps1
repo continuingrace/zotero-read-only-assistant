@@ -48,13 +48,13 @@ try {
     if ($env:ZOTERO_CHATGPT_TEST_PROFILE) {
         Write-Output "INSTALL TEST OK"
     } else {
-        Show-InstallerMessage -Title "Zotero for ChatGPT 설치" -Icon "Information" -Text "설치가 완료되었습니다.`n`n1. Zotero Desktop을 열어 두세요.`n2. ChatGPT 데스크톱 앱을 완전히 종료한 뒤 다시 여세요.`n3. 플러그인 > Personal에서 Zotero for ChatGPT를 설치하세요.`n4. 새 일반 Chat에서 최근 Zotero 자료 3개를 찾아 달라고 해보세요."
+        Show-InstallerMessage -Title "Zotero for ChatGPT - Installation complete" -Icon "Information" -Text "Installation is complete. Nothing else will open after you click OK.`n`n1. Keep Zotero Desktop open.`n2. Fully quit and reopen the ChatGPT desktop app.`n3. Open Plugins > Personal and install Zotero for ChatGPT.`n4. Start a new regular Chat and ask: Find my 3 most recent Zotero items."
     }
 } catch {
     if ($env:ZOTERO_CHATGPT_TEST_PROFILE) {
         Write-Error $_
     } else {
-        Show-InstallerMessage -Title "Zotero for ChatGPT 설치 오류" -Icon "Error" -Text "설치하지 못했습니다.`n`n$($_.Exception.Message)"
+        Show-InstallerMessage -Title "Zotero for ChatGPT - Installation error" -Icon "Error" -Text "Installation failed.`n`n$($_.Exception.Message)"
     }
     exit 1
 }
