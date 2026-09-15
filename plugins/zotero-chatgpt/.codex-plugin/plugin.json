@@ -1,6 +1,6 @@
 {
   "name": "zotero-chatgpt",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Use a local Zotero Desktop library from ChatGPT with read tools and confirmation-gated tag changes.",
   "author": {
     "name": "continuingrace",

@@ -5,19 +5,20 @@
 참가자에게 다음 두 링크만 보냅니다.
 
 1. Zotero Desktop 설치: <https://www.zotero.org/download/>
-2. GitHub 최신 Release의 `Install-Zotero-for-ChatGPT.exe`
+2. GitHub 최신 Release의 `Zotero-for-ChatGPT-Windows.zip`
 
-참가자별 파일을 만들거나 주소·토큰을 발급할 필요가 없습니다. 참가자에게 소스 ZIP, `Start-Participant.vbs`, Python 설치 파일을 보내지 않습니다.
+참가자별 파일을 만들거나 주소·토큰을 발급할 필요가 없습니다. 참가자에게 GitHub의 `Source code (zip)`, `Start-Participant.vbs`, Python 설치 파일을 보내지 않습니다.
 
 ## 참가자에게 그대로 보낼 문장
 
 ```text
 1. Zotero Desktop과 Windows용 ChatGPT 앱을 설치해 주세요.
 2. Zotero를 열고 설정의 고급 항목에서 '이 컴퓨터의 다른 애플리케이션이 Zotero와 통신하도록 허용'을 켜 주세요.
-3. 함께 보낸 GitHub 링크에서 Install-Zotero-for-ChatGPT.exe를 받아 더블클릭해 주세요.
-4. 설치 완료 후 ChatGPT 앱을 완전히 종료했다가 다시 열어 주세요.
-5. ChatGPT 설정의 플러그인 → Personal에서 Zotero for ChatGPT를 설치하거나 켜 주세요.
-6. 새 일반 채팅에서 '내 Zotero에서 최근 추가된 자료 3개를 찾아줘'라고 입력해 주세요.
+3. 함께 보낸 GitHub 링크에서 Zotero-for-ChatGPT-Windows.zip을 받아 압축을 풀어 주세요.
+4. 압축을 푼 폴더의 Install-Zotero-for-ChatGPT.cmd를 더블클릭해 주세요. 명령을 입력할 필요는 없습니다.
+5. 설치 완료 후 ChatGPT 앱을 완전히 종료했다가 다시 열어 주세요.
+6. ChatGPT 설정의 플러그인 → Personal에서 Zotero for ChatGPT를 설치하거나 켜 주세요.
+7. 새 일반 채팅에서 '내 Zotero에서 최근 추가된 자료 3개를 찾아줘'라고 입력해 주세요.
 ```
 
 ## 강의 당일 확인 순서

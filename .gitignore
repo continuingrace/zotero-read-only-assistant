@@ -10,3 +10,4 @@ participant/.bridge.pid
 .build/
 release/
 work/
+distribution/windows/package/

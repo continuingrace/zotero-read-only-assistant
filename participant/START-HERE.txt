@@ -2,12 +2,13 @@
 
 이 폴더는 이전 로컬 목록 열람 방식의 개발·호환용 파일입니다.
 ChatGPT 일반 채팅에서 Zotero를 사용하려면 GitHub Releases에서
-Install-Zotero-for-ChatGPT.exe를 받아 더블클릭하세요.
+Zotero-for-ChatGPT-Windows.zip을 받아 압축을 풀고
+Install-Zotero-for-ChatGPT.cmd를 더블클릭하세요.
 
 준비물
 1. Zotero Desktop: https://www.zotero.org/download/
 2. Windows용 ChatGPT 데스크톱 앱
-3. Install-Zotero-for-ChatGPT.exe
+3. Zotero-for-ChatGPT-Windows.zip
 
 Python과 터미널은 필요하지 않습니다.
 자세한 내용은 docs/participant-installation.md를 확인하세요.

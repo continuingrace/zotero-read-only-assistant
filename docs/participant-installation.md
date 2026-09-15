@@ -7,7 +7,7 @@
 - 개인 Windows PC
 - [Zotero Desktop](https://www.zotero.org/download/)
 - Windows용 ChatGPT 데스크톱 앱
-- `Install-Zotero-for-ChatGPT.exe`
+- `Zotero-for-ChatGPT-Windows.zip`
 
 각 참가자는 자기 PC와 자기 ChatGPT 계정을 사용합니다. 관리자에게 HTTPS 주소, 포트 번호, 인증 토큰을 받아 적는 과정은 없습니다.
 
@@ -15,8 +15,8 @@
 
 1. Zotero Desktop을 설치하고 엽니다.
 2. Zotero의 `편집 → 설정 → 고급`에서 `이 컴퓨터의 다른 애플리케이션이 Zotero와 통신하도록 허용`을 켭니다. macOS가 아니라 Windows 기준이며 Zotero 버전에 따라 문구 위치가 조금 다를 수 있습니다.
-3. `Install-Zotero-for-ChatGPT.exe`를 더블클릭합니다.
-4. Windows 보호 화면이 나오면 파일 이름과 GitHub 배포처를 확인한 뒤 `추가 정보 → 실행`을 누릅니다.
+3. `Zotero-for-ChatGPT-Windows.zip`을 마우스 오른쪽 버튼으로 눌러 `모두 압축 풀기`를 선택합니다.
+4. 압축을 푼 폴더의 `Install-Zotero-for-ChatGPT.cmd`를 더블클릭합니다. 검은 창이 잠깐 나타날 수 있지만 명령을 입력하지 않습니다.
 5. `설치가 완료되었습니다` 안내가 나오면 ChatGPT 앱을 완전히 종료합니다. 창만 닫지 말고 작업표시줄 알림 영역에서도 종료한 다음 다시 엽니다.
 6. ChatGPT에서 `설정 → 플러그인`을 열고 `Personal` 목록의 `Zotero for ChatGPT`를 설치하거나 활성화합니다.
 7. 새 일반 채팅을 엽니다. Codex Work를 열 필요가 없습니다.

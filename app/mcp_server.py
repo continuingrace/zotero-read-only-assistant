@@ -102,7 +102,7 @@ async def _handle_rpc(payload: Any, client: ZoteroClient) -> dict[str, Any] | No
     if method in {"notifications/initialized", "notifications/cancelled"}:
         return None
     if method == "initialize":
-        return {"jsonrpc": "2.0", "id": request_id, "result": {"protocolVersion": PROTOCOL_VERSION, "capabilities": {"tools": {"listChanged": False}}, "serverInfo": {"name": "zotero-chatgpt-mcp", "version": "0.2.0"}}}
+        return {"jsonrpc": "2.0", "id": request_id, "result": {"protocolVersion": PROTOCOL_VERSION, "capabilities": {"tools": {"listChanged": False}}, "serverInfo": {"name": "zotero-chatgpt-mcp", "version": "0.2.1"}}}
     if method == "tools/list":
         return {"jsonrpc": "2.0", "id": request_id, "result": {"tools": TOOL_DEFINITIONS}}
     if method == "tools/call":

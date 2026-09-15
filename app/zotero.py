@@ -72,7 +72,7 @@ class ZoteroClient:
                 "Accept": "application/json",
                 "Zotero-API-Version": "3",
                 "Zotero-Allowed-Request": "true",
-                "User-Agent": "zotero-chatgpt-mcp/0.2.0",
+                "User-Agent": "zotero-chatgpt-mcp/0.2.1",
             },
         )
 

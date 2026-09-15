@@ -2,16 +2,17 @@
 
 Windows용 ChatGPT 데스크톱 앱의 일반 채팅에서 각 사용자의 로컬 Zotero Desktop 자료를 검색하고 분석하는 플러그인입니다. 참가자는 Python, 터미널, PowerShell, 포트 번호, 인증 토큰, HTTPS 주소를 입력하지 않습니다.
 
-기존 `Zotero-Read-Only-Assistant.exe`는 브라우저에서 목록만 보는 로컬 도우미였습니다. 이 프로젝트의 새 설치 파일 `Install-Zotero-for-ChatGPT.exe`는 ChatGPT가 Zotero 도구를 직접 호출하도록 로컬 MCP 플러그인을 설치합니다. 요약·비교·질문 답변은 ChatGPT가 수행합니다.
+기존 `Zotero-Read-Only-Assistant.exe`는 브라우저에서 목록만 보는 로컬 도우미였습니다. 새 `Zotero-for-ChatGPT-Windows.zip`은 ChatGPT가 Zotero 도구를 직접 호출하도록 로컬 MCP 플러그인을 설치합니다. 요약·비교·질문 답변은 ChatGPT가 수행합니다.
 
 ## 참가자 설치
 
 1. [Zotero Desktop](https://www.zotero.org/download/)을 설치하고 실행합니다.
 2. Zotero에서 `설정 → 고급 → 이 컴퓨터의 다른 애플리케이션이 Zotero와 통신하도록 허용`을 켭니다.
-3. GitHub Releases에서 `Install-Zotero-for-ChatGPT.exe`를 내려받아 더블클릭합니다.
-4. 설치 완료 안내가 나오면 ChatGPT 데스크톱 앱을 완전히 종료했다가 다시 엽니다.
-5. ChatGPT의 `설정 → 플러그인`에서 `Personal → Zotero for ChatGPT`를 설치하거나 활성화합니다.
-6. 새 일반 채팅에서 다음과 같이 말합니다.
+3. GitHub Releases에서 `Zotero-for-ChatGPT-Windows.zip`을 내려받아 압축을 풉니다.
+4. 압축을 푼 폴더의 `Install-Zotero-for-ChatGPT.cmd`를 더블클릭합니다. 명령을 입력할 필요는 없습니다.
+5. 설치 완료 안내가 나오면 ChatGPT 데스크톱 앱을 완전히 종료했다가 다시 엽니다.
+6. ChatGPT의 `설정 → 플러그인`에서 `Personal → Zotero for ChatGPT`를 설치하거나 활성화합니다.
+7. 새 일반 채팅에서 다음과 같이 말합니다.
 
 ```text
 내 Zotero에서 최근 추가된 논문 5개를 찾아줘.
@@ -78,7 +79,7 @@ powershell -ExecutionPolicy Bypass -File .\build-windows.ps1
 
 빌드 결과:
 
-- `release/Install-Zotero-for-ChatGPT.exe`: 참가자용 설치 파일
+- `release/Zotero-for-ChatGPT-Windows.zip`: 참가자용 설치 패키지
 - `release/Zotero-ChatGPT-MCP.exe`: 플러그인 내부 MCP 실행 파일
 - `release/Zotero-Read-Only-Assistant.exe`: 이전 로컬 목록 열람 도우미
 
